@@ -92,6 +92,28 @@ test('adding an item still registers acquisition flags', () => {
   for (const value of [h, ...registration(h).slice(1,3)]) assert.equal(after.p.int(value), 1);
 });
 
+for (const [name, reward] of [['Item_Scale_Silver', 0x4147BF54], ['Item_Scale_Gold', 0x2079723B]]) {
+  test(`${name} links its minigame reward to acquisition and optional reset`, () => {
+    const f = fixture([]); const h = item(name); const before = f.slot();
+    const flags = [...registration(h).slice(1, 3), reward];
+    const added = edit(f, { additions: [h] });
+    for (const value of [h, ...flags]) assert.equal(added.p.int(value), 1);
+    assert.deepEqual(changedHashes(before.p, added.p), [h, ...flags].sort((a,b)=>a-b));
+    const removed = api.readSlot(...api.updateSlot(added, changes(added, { removals: [h] }), editable));
+    assert.deepEqual(changedHashes(added.p, removed.p), [h]);
+    for (const flag of flags) assert.equal(removed.p.int(flag), 1);
+    const cleared = api.readSlot(...api.updateSlot(added,
+      changes(added, { removals: [h], clearAcquisitions: [h] }), editable));
+    assert.deepEqual(changedHashes(added.p, cleared.p), [h, ...flags].sort((a,b)=>a-b));
+    const again = api.readSlot(...api.updateSlot(cleared, changes(cleared), editable));
+    for (const value of [h, ...flags]) assert.equal(again.p.int(value), 0);
+    assert.deepEqual(added.c.bytes, before.c.bytes);
+    assert.throws(() => edit(f, { additions: [h], flags: [[reward, false]] }), /conflict/);
+    assert.throws(() => api.updateSlot(added,
+      changes(added, { removals: [h], clearAcquisitions: [h], flags: [[reward, true]] }), editable), /conflict/);
+  });
+}
+
 test('reject flag-only resets, contradictory progress edits, and add/remove conflicts', () => {
   const f = fixture(); const h = item('Item_Boomerang'); const flag = registration(h)[1];
   assert.throws(() => edit(f, { clearAcquisitions: [h] }), /requires removing/);

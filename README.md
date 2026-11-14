@@ -9,6 +9,7 @@ Original editor by [Traiver](https://github.com/Traiver/OOT-SW2SE) and upstream 
 - Edit rupees, hearts, magic & more.
 - Change item quantities, bottles, small keys, and bag or quiver capacity.
 - Add missing items, including masks, with their acquisition flags set automatically.
+- Adding Silver or Golden Scale also sets its mapped minigame reward flag. Removing a Scale preserves that flag unless Clear acquisition flags is selected.
 - Remove supported owned single items, optionally clearing their mapped acquisition flags. Acquisition history is kept by default; story and quest progress are not reset. Unequip weapons and shields in both eras first. Default clothes, quantities, and capacity upgrades use their own controls rather than inventory removal.
 - Export replacement files as a ZIP or to a new patch folder on Windows and macOS. Export names include a UTC timestamp followed by a UUID; replacement files sit inside a folder named with that same UTC timestamp (`yyyyMMdd_HHmmss`). Exports contain only replacement files, not a complete backup.
 - Toggle progress flags and change the spoken dialogue language when `option.sav` is available.
